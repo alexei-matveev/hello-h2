@@ -32,10 +32,10 @@
      (jdbc/query db ["select KeY as k, VaLuE as V from kvtable limit 5"]))
 
     ;; Numeric literals "0.0" and "0.0e0"  in H2 SQL are decimals. The
-    ;; expression  "integer  + 0.0"  would  also  be a  decimal.   You
-    ;; probably want  doubles. Use  "cast(value as double)"  for that.
-    ;; Aggregate funcitons  median() and  percentile_cont() apparently
-    ;; always return a decimal.
+    ;; expression "i + 0.0" with integer  "i" would also be a decimal.
+    ;; You  probably  want  doubles.    Use  "cast(i  as  double)"  to
+    ;; aggregate.  Aggregate functions  median() and percentile_cont()
+    ;; apparently always return a decimal.
     (println
      (time
       (jdbc/query db
@@ -44,4 +44,6 @@
                         ", median(value) as p50"
                         ", percentile_cont(0.95) within group (order by value) as p95"
                         "  from kvtable group by key")])))
+    ;; If any of  the above fails, the table is  not deleted. In Cider
+    ;; you may need to M-x sesmon-restart:
     (jdbc/db-do-commands db (jdbc/drop-table-ddl :kvtable))))
