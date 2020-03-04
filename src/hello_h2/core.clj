@@ -13,7 +13,7 @@
 ;; FWIW, it is not "sa"/"".
 (def db {:dbtype "h2:mem", :dbname "demo"})
 
-;; For a million  rows it takes about  10s to execute. Most  of it ist
+;; For a  million rows it  takes about 10s to  execute. Most of  it is
 ;; populating the table.
 (defn -main []
   (jdbc/with-db-connection [db db]
@@ -32,9 +32,9 @@
 
     ;; Numeric literals "0.0" and "0.0e0"  in H2 SQL are decimals. The
     ;; expression "value + 0.0" would  also be a decimal. You probably
-    ;; want doubles:
+    ;; want doubles. Median is apparently always a decimal.
     (println
      (time
       (jdbc/query db
-                  ["select key, avg(cast(value as double)) as avg from kvtable group by key"])))
+                  ["select key, avg(cast(value as double)) as avg, median(value) as median from kvtable group by key"])))
     (jdbc/db-do-commands db (jdbc/drop-table-ddl :kvtable))))
