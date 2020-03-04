@@ -13,23 +13,28 @@
 ;; FWIW, it is not "sa"/"".
 (def db {:dbtype "h2:mem", :dbname "demo"})
 
+;; For a million  rows it takes about  10s to execute. Most  of it ist
+;; populating the table.
 (defn -main []
   (jdbc/with-db-connection [db db]
     (jdbc/db-do-commands db
                          (jdbc/create-table-ddl :kvtable
                                                 [[:key "varchar(256)"]
                                                  [:value :integer]]))
-    (jdbc/insert-multi! db
-                        :kvtable
-                        [:key :value]
-                        (for [x (range 100)]
-                          [(rand-nth ["a" "b"]) (rand-int 10)]))
+    (time
+     (jdbc/insert-multi! db
+                         :kvtable
+                         [:key :value]
+                         (for [x (range (* 1000 1000))]
+                           [(rand-nth ["a" "b"]) (rand-int 10)])))
     (println
-     (jdbc/query db ["select KeY as k, VaLuE as V from kvtable"]))
+     (jdbc/query db ["select KeY as k, VaLuE as V from kvtable limit 5"]))
 
     ;; Numeric literals "0.0" and "0.0e0"  in H2 SQL are decimals. The
     ;; expression "value + 0.0" would  also be a decimal. You probably
     ;; want doubles:
     (println
-     (jdbc/query db ["select key, avg(cast(value as double)) as avg from kvtable group by key"]))
+     (time
+      (jdbc/query db
+                  ["select key, avg(cast(value as double)) as avg from kvtable group by key"])))
     (jdbc/db-do-commands db (jdbc/drop-table-ddl :kvtable))))
