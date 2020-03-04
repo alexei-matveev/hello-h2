@@ -9,7 +9,8 @@
   (:require [clojure.java.jdbc :as jdbc]))
 
 ;; Starting with c.j.jdbc 0.7.6 spect for  in memory H2 DB can be like
-;; this [2]. FIXME: what are the defaults for username/password?
+;; this [2].  What are the defaults for username/password? FWIW, it is
+;; not "sa"/"".
 (def db {:dbtype "h2:mem", :dbname "demo"})
 
 (defn -main []
