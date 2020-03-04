@@ -23,28 +23,30 @@
     (jdbc/db-do-commands db ddl))
   (try
     (do
-      (time
-       (jdbc/insert-multi! db
-                           :kvtable
-                           [:key :value]
-                           (for [x (range (* 1000 1000))]
-                             [(rand-nth ["a" "b"]) (rand 10)])))
-      (println
-       (jdbc/query db ["select KeY as k, VaLuE as V from kvtable limit 5"]))
+      ;; Building a million  rows like this is fast,  even when forced
+      ;; with (doall ...). Insertion is slow ...
+      (let [rows (for [x (range (* 1000 1000))]
+                   [(rand-nth ["a" "b"]) (rand 10)])]
+        (jdbc/insert-multi! db
+                            :kvtable
+                            [:key :value]
+                            rows))
+      ;; This works as  expected.  Resulting rows look like  {:k b, :v
+      ;; 4.218739125147892}
+      (comment
+        (jdbc/query db ["select KeY as k, VaLuE as V from kvtable limit 5"]))
 
       ;; Numeric   literals  "0.0"   and   "0.0e0"  in   H2  SQL   are
       ;; decimals. The  expression "i  + 0.0"  with integer  "i" would
       ;; also be a  decimal.  You probably want  doubles.  Use "cast(i
       ;; as double)"  to aggregate.  Aggregate functions  median() and
       ;; percentile_cont() apparently always return a decimal.
-      (println
-       (time
-        (jdbc/query db
-                    [(str "select key"
-                          ", avg(value) as avg"
-                          ", median(value) as p50"
-                          ", percentile_cont(0.95) within group (order by value) as p95"
-                          "  from kvtable group by key")]))))
+      (jdbc/query db
+                  [(str "select key"
+                        ", avg(value) as avg"
+                        ", median(value) as p50"
+                        ", percentile_cont(0.95) within group (order by value) as p95"
+                        "  from kvtable group by key")]))
     ;; Without try & finally, if any  of the above fails, the table is
     ;; not deleted.  In Cider you would need to M-x sesmon-restart:
     (finally
@@ -53,4 +55,4 @@
 
 (defn -main []
   (jdbc/with-db-connection [db db]
-    (task db)))
+    (println (task db))))
