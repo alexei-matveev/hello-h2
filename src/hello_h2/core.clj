@@ -16,15 +16,14 @@
 (defn -main []
   (jdbc/with-db-connection [db db]
     (jdbc/db-do-commands db
-                         (jdbc/create-table-ddl :filetable
-                                                [[:name "varchar(3200)"]
-                                                 [:path "varchar(3200)"]
-                                                 [:origname "varchar(3200)"]]))
+                         (jdbc/create-table-ddl :kvtable
+                                                [[:key "varchar(256)"]
+                                                 [:value :integer]]))
     (jdbc/insert-multi! db
-                        :filetable
-                        [:name :path :origname]
-                        [["file-name" "file/path" "original-name"]
-                         ["another-name" "another/path" "less-original"]])
+                        :kvtable
+                        [:key :value]
+                        [["a" 42]
+                         ["b" -42]])
     (println
-     (jdbc/query db ["select nAmE, PaTh, origname as original from filetable"]))
-    (jdbc/db-do-commands db (jdbc/drop-table-ddl :filetable))))
+     (jdbc/query db ["select KeY as k, VaLuE as V from kvtable"]))
+    (jdbc/db-do-commands db (jdbc/drop-table-ddl :kvtable))))
