@@ -36,5 +36,8 @@
     (println
      (time
       (jdbc/query db
-                  ["select key, avg(cast(value as double)) as avg, median(value) as median from kvtable group by key"])))
+                  [(str "select key"
+                        ", avg(cast(value as double)) as avg"
+                        ", median(value) as median"
+                        "  from kvtable group by key")])))
     (jdbc/db-do-commands db (jdbc/drop-table-ddl :kvtable))))
