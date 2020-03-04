@@ -22,8 +22,14 @@
     (jdbc/insert-multi! db
                         :kvtable
                         [:key :value]
-                        [["a" 42]
-                         ["b" -42]])
+                        (for [x (range 100)]
+                          [(rand-nth ["a" "b"]) (rand-int 10)]))
     (println
      (jdbc/query db ["select KeY as k, VaLuE as V from kvtable"]))
+
+    ;; Numeric literals "0.0" and "0.0e0"  in H2 SQL are decimals. The
+    ;; expression "value + 0.0" would  also be a decimal. You probably
+    ;; want doubles:
+    (println
+     (jdbc/query db ["select key, avg(cast(value as double)) as avg from kvtable group by key"]))
     (jdbc/db-do-commands db (jdbc/drop-table-ddl :kvtable))))
