@@ -24,4 +24,5 @@
                             :path "file/path"
                             :origname "original-name"})
   (println
-   (j/query db ["select * from filetable"])))
+   (j/query db ["select * from filetable"]))
+  (j/db-do-commands db (j/drop-table-ddl :filetable)))
