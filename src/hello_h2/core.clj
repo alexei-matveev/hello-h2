@@ -9,8 +9,9 @@
   (:require [clojure.java.jdbc :as jdbc]))
 
 ;; Starting with c.j.jdbc  0.7.6 specs for the in memory  DB can be as
-;; simple  as here  [2].   What are  the  defaults for  user/password?
-;; FWIW, it is not "sa"/"".
+;; simple as here  [2]. You need a  named DB if you want  to access it
+;; from anywhere  else in  the same  JVM.  What  are the  defaults for
+;; user/password?  FWIW, it is not "sa"/"".
 (def db {:dbtype "h2:mem", :dbname "demo"})
 
 ;; For a million rows it takes about 10s  + n * 1s to execute. Of that
@@ -20,6 +21,7 @@
   (let [ddl (jdbc/create-table-ddl :kvtable
                                    [[:key "varchar(256)"]
                                     [:value :double]])]
+    #_(println ddl)
     (jdbc/db-do-commands db ddl))
   (try
     (do
@@ -51,6 +53,7 @@
     ;; not deleted.  In Cider you would need to M-x sesmon-restart:
     (finally
       (let [ddl (jdbc/drop-table-ddl :kvtable)]
+        #_(println ddl)
         (jdbc/db-do-commands db ddl)))))
 
 (defn -main []
