@@ -5,7 +5,7 @@
 ;; [1] http://makble.com/using-h2-in-memory-database-in-clojure
 ;;
 (ns hello-h2.core
-  (:require [clojure.java.jdbc :as j]))
+  (:require [clojure.java.jdbc :as jdbc]))
 
 (def db
   {:classname "org.h2.Driver"
@@ -15,15 +15,15 @@
    :password ""})
 
 (defn -main []
-  (j/with-db-connection [db db]
-    (j/db-do-commands db
-                      (j/create-table-ddl :filetable
-                                          [[:name "varchar(3200)"]
-                                           [:path "varchar(3200)"]
-                                           [:origname "varchar(3200)"]]))
-    (j/insert! db :filetable {:name "file-name"
-                              :path "file/path"
-                              :origname "original-name"})
+  (jdbc/with-db-connection [db db]
+    (jdbc/db-do-commands db
+                         (jdbc/create-table-ddl :filetable
+                                                [[:name "varchar(3200)"]
+                                                 [:path "varchar(3200)"]
+                                                 [:origname "varchar(3200)"]]))
+    (jdbc/insert! db :filetable {:name "file-name"
+                                 :path "file/path"
+                                 :origname "original-name"})
     (println
-     (j/query db ["select * from filetable"]))
-    (j/db-do-commands db (j/drop-table-ddl :filetable))))
+     (jdbc/query db ["select * from filetable"]))
+    (jdbc/db-do-commands db (jdbc/drop-table-ddl :filetable))))
