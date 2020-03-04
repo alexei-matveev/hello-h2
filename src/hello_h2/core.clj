@@ -10,7 +10,7 @@
 
 ;; Starting with c.j.jdbc 0.7.6 spect for  in memory H2 DB can be like
 ;; this [2]. FIXME: what are the defaults for username/password?
-(def db {:dbtype "h2:mem", :dbname "demo", :user "sa", :password ""})
+(def db {:dbtype "h2:mem", :dbname "demo"})
 
 (defn -main []
   (jdbc/with-db-connection [db db]
