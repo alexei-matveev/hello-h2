@@ -26,5 +26,5 @@
                         [["file-name" "file/path" "original-name"]
                          ["another-name" "another/path" "less-original"]])
     (println
-     (jdbc/query db ["select * from filetable"]))
+     (jdbc/query db ["select nAmE, PaTh, origname as original from filetable"]))
     (jdbc/db-do-commands db (jdbc/drop-table-ddl :filetable))))
