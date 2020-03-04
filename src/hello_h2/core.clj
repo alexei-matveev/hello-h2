@@ -1,5 +1,5 @@
 ;;
-;; Clojure + H2 example at [1] uses outdated version of
+;; Clojure   +  H2   example   at  [1]   uses   outdated  version   of
 ;; clojure.java.jdbc [2].
 ;;
 ;; [1] http://makble.com/using-h2-in-memory-database-in-clojure
@@ -8,9 +8,9 @@
 (ns hello-h2.core
   (:require [clojure.java.jdbc :as jdbc]))
 
-;; Starting with c.j.jdbc 0.7.6 spect for  in memory H2 DB can be like
-;; this [2].  What are the defaults for username/password? FWIW, it is
-;; not "sa"/"".
+;; Starting with c.j.jdbc  0.7.6 specs for the in memory  DB can be as
+;; simple  as here  [2].   What are  the  defaults for  user/password?
+;; FWIW, it is not "sa"/"".
 (def db {:dbtype "h2:mem", :dbname "demo"})
 
 (defn -main []
