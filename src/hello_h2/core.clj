@@ -1,18 +1,16 @@
 ;;
 ;; Clojure + H2 example at [1] uses outdated version of
-;; clojure.java.jdbc.
+;; clojure.java.jdbc [2].
 ;;
 ;; [1] http://makble.com/using-h2-in-memory-database-in-clojure
+;; [2] http://clojure-doc.org/articles/ecosystem/java_jdbc/home.html
 ;;
 (ns hello-h2.core
   (:require [clojure.java.jdbc :as jdbc]))
 
-(def db
-  {:classname "org.h2.Driver"
-   :subprotocol "h2:mem"
-   :subname "demo;DB_CLOSE_DELAY=-1"
-   :user "sa"
-   :password ""})
+;; Starting with c.j.jdbc 0.7.6 spect for  in memory H2 DB can be like
+;; this [2]. FIXME: what are the defaults for username/password?
+(def db {:dbtype "h2:mem", :dbname "demo", :user "sa", :password ""})
 
 (defn -main []
   (jdbc/with-db-connection [db db]
