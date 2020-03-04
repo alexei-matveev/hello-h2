@@ -19,9 +19,11 @@
                                                 [[:name "varchar(3200)"]
                                                  [:path "varchar(3200)"]
                                                  [:origname "varchar(3200)"]]))
-    (jdbc/insert! db :filetable {:name "file-name"
-                                 :path "file/path"
-                                 :origname "original-name"})
+    (jdbc/insert-multi! db
+                        :filetable
+                        [:name :path :origname]
+                        [["file-name" "file/path" "original-name"]
+                         ["another-name" "another/path" "less-original"]])
     (println
      (jdbc/query db ["select * from filetable"]))
     (jdbc/db-do-commands db (jdbc/drop-table-ddl :filetable))))
