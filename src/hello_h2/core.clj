@@ -15,14 +15,15 @@
    :password ""})
 
 (defn -main []
-  (j/db-do-commands db
-                    (j/create-table-ddl :filetable
-                                        [[:name "varchar(3200)"]
-                                         [:path "varchar(3200)"]
-                                         [:origname "varchar(3200)"]]))
-  (j/insert! db :filetable {:name "file-name"
-                            :path "file/path"
-                            :origname "original-name"})
-  (println
-   (j/query db ["select * from filetable"]))
-  (j/db-do-commands db (j/drop-table-ddl :filetable)))
+  (j/with-db-connection [db db]
+    (j/db-do-commands db
+                      (j/create-table-ddl :filetable
+                                          [[:name "varchar(3200)"]
+                                           [:path "varchar(3200)"]
+                                           [:origname "varchar(3200)"]]))
+    (j/insert! db :filetable {:name "file-name"
+                              :path "file/path"
+                              :origname "original-name"})
+    (println
+     (j/query db ["select * from filetable"]))
+    (j/db-do-commands db (j/drop-table-ddl :filetable))))
