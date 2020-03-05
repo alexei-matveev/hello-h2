@@ -1,12 +1,10 @@
-(ns hello-h2.fasta)
-
 ;;
-;; This is a  hot topic at the beginning of  2020. See e.g.GenBank dor
-;; SARS-CoV-2 [1].
+;; This is a  hot topic at the beginning of  2020, understandably. See
+;; e.g. Genbank for SARS-CoV-2 [1].
 ;;
-;; [1] https://www.ncbi.nlm.nih.gov/genome/genomes/86693
+;; [1] https://www.ncbi.nlm.nih.gov/nuccore/MN908947
 ;;
-;; TIL, curl can list FTP dirs too, just add a trailing slash!
+;; TIL, curl  can list FTP  dirs too, just  add a trailing  slash!
 ;;
 ;;     $ curl -LO ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/009/858/895/GCA_009858895.3_ASM985889v3/GCA_009858895.3_ASM985889v3_genomic.fna.gz
 ;;
@@ -18,6 +16,15 @@
 ;;     ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCTGTTCTCTAAACGAACTTTAA
 ;;     AATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGG
 ;;
+;; The FTP  URLs are hard to  find.  Entrez Tools make  a Docker image
+;; available [3]:
+;;
+;;     $ docker run --rm ncbi/edirect efetch -db nucleotide -id MN908947 -format gb
+;;
+;; [3] https://github.com/ncbi/docker/tree/master/edirect
+;;
+(ns hello-h2.fasta)
+
 
 ;; MN908947.3 Severe acute respiratory syndrome coronavirus 2 isolate
 ;; Wuhan-Hu-1, complete genome
