@@ -17,7 +17,7 @@
 ;;     AATCTGTGTGGCTGTCACTCGGCTGCATGCTTAGTGCACTCACGCAGTATAATTAATAACTAATTACTGTCGTTGACAGG
 ;;
 ;; The FTP  URLs are hard to  find.  Entrez Tools make  a Docker image
-;; available [3]:
+;; available [3], also in "fasta" format:
 ;;
 ;;     $ docker run --rm ncbi/edirect efetch -db nucleotide -id MN908947 -format gb
 ;;
