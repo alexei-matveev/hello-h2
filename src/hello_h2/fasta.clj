@@ -87,8 +87,8 @@
 ;;  [\S \- \T \C \A]
 ;;  ...
 ;;
-;; Returns codon  translation table as  a map  and starter codos  as a
-;; set.
+;; Returns  codon translation  table as  a map  and a  smaller starter
+;; codons maps.
 ;;
 (defn- get-iupac-tables []
   (let [iupac_txt "https://raw.githubusercontent.com/biojava/biojava/master/biojava-core/src/main/resources/org/biojava/nbio/core/sequence/iupac.txt"
@@ -103,6 +103,5 @@
         columns (apply map vector table)]
     {:codons (into {} (for [[aa starts base1 base2 base3] columns]
                         [[base1 base2 base3] aa]))
-     :starts (into #{} (for [[aa starts base1 base2 base3] columns
-                             :when (not= starts \-)]
-                         [base1 base2 base3]))}))
+     :starts (into {} (for [[aa starts base1 base2 base3] columns :when (not= starts \-)]
+                        [[base1 base2 base3] starts]))}))
