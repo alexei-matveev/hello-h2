@@ -82,24 +82,20 @@
         assembly-summary (get-assembly-summary)
         ;; Column names as keywords:
         cols (map keyword (first assembly-summary))
-        rows (rest assembly-summary)]
-    (let [ddl (jdbc/create-table-ddl :assembly_summary
-                                     (for [c cols]
-                                       [c "varchar"]))]
-      #_(println ddl)
+        rows (rest assembly-summary)
+        tab :assembly_summary]
+    (let [ddl (jdbc/create-table-ddl tab (for [c cols]
+                                           [c "varchar"]))]
       (jdbc/db-do-commands db ddl)
       (try
         (do
-          (jdbc/insert-multi! db
-                              :assembly_summary
-                              cols
-                              rows)
+          (jdbc/insert-multi! db tab cols rows)
           ;; Return value:
           (jdbc/query db
                       ["select assembly_accession from assembly_summary where organism_name = ?"
                        organism_name]))
         (finally
-          (let [ddl (jdbc/drop-table-ddl :assembly_summary)]
+          (let [ddl (jdbc/drop-table-ddl tab)]
             (jdbc/db-do-commands db ddl)))))))
 
 (defn -main []
