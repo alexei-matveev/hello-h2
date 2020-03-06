@@ -71,14 +71,18 @@
     (cons (clojure.string/split header #"\t" -1)
           (map #(clojure.string/split % #"\t" -1) rows))))
 
+;; columns = :assembly_accession :bioproject :biosample :wgs_master
+;; :refseq_category :taxid :species_taxid :organism_name
+;; :infraspecific_name :isolate :version_status :assembly_level
+;; :release_type :genome_rep :seq_rel_date :asm_name :submitter
+;; :gbrs_paired_asm :paired_asm_comp :ftp_path :excluded_from_refseq
+;; :relation_to_type_material)
 (defn- genbank [db]
-  (let [cols (vector :assembly_accession
-                     :bioproject :biosample
-                     :wgs_master :refseq_category
-                     :taxid :species_taxid :organism_name :infraspecific_name :isolate
-                     :version_status :assembly_level :release_type :genome_rep :seq_rel_date
-                     :asm_name :submitter :gbrs_paired_asm :paired_asm_comp :ftp_path
-                     :excluded_from_refseq :relation_to_type_material)]
+  (let [organism_name "Severe acute respiratory syndrome coronavirus 2"
+        assembly-summary (get-assembly-summary)
+        ;; Column names as keywords:
+        cols (map keyword (first assembly-summary))
+        rows (rest assembly-summary)]
     (let [ddl (jdbc/create-table-ddl :assembly_summary
                                      (for [c cols]
                                        [c "varchar"]))]
@@ -86,15 +90,14 @@
       (jdbc/db-do-commands db ddl)
       (try
         (do
-          (let [rows (rest (get-assembly-summary))]
-            (jdbc/insert-multi! db
-                                :assembly_summary
-                                cols
-                                rows))
+          (jdbc/insert-multi! db
+                              :assembly_summary
+                              cols
+                              rows)
           ;; Return value:
           (jdbc/query db
                       ["select assembly_accession from assembly_summary where organism_name = ?"
-                       "Severe acute respiratory syndrome coronavirus 2"]))
+                       organism_name]))
         (finally
           (let [ddl (jdbc/drop-table-ddl :assembly_summary)]
             (jdbc/db-do-commands db ddl)))))))
