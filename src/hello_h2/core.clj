@@ -56,18 +56,22 @@
         #_(println ddl)
         (jdbc/db-do-commands db ddl)))))
 
+;; See ftp://ftp.ncbi.nlm.nih.gov/genomes/all/README.txt
 (defn get-assembly-summary []
-  ;; curl ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/viral/assembly_summary.txt > viral-assembly-summary.txt
-  (let [url "/home/downloads/covid-19/viral-assembly-summary.txt"
+  ;; The file is ~8M and about 35k lines:
+  (let [url "ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/viral/assembly_summary.txt"
         lines (line-seq (clojure.java.io/reader url))
+        ;; First line is a comment:
         tsv (rest lines)
+        ;; Second line list columns, strip "# " prefix:
         header (subs (first tsv) 2)
+        ;; Actual data:
         rows (rest tsv)]
     ;; Limit of -1 tells not to omit any empty trailing columns.
     (cons (clojure.string/split header #"\t" -1)
           (map #(clojure.string/split % #"\t" -1) rows))))
 
-(defn- task1 [db]
+(defn- genbank [db]
   (let [cols (vector :assembly_accession
                      :bioproject :biosample
                      :wgs_master :refseq_category
@@ -91,4 +95,4 @@
 
 (defn -main []
   (jdbc/with-db-connection [db db]
-    (task1 db)))
+    (genbank db)))
