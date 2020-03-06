@@ -56,10 +56,6 @@
         #_(println ddl)
         (jdbc/db-do-commands db ddl)))))
 
-(defn -main []
-  (jdbc/with-db-connection [db db]
-    (println (task db))))
-
 (defn get-assembly-summary []
   ;; curl ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/viral/assembly_summary.txt > viral-assembly-summary.txt
   (let [url "/home/downloads/covid-19/viral-assembly-summary.txt"
@@ -67,5 +63,32 @@
         tsv (rest lines)
         header (subs (first tsv) 2)
         rows (rest tsv)]
-    (take 2 (cons (clojure.string/split header #"\t")
-                  (map #(clojure.string/split % #"\t") rows)))))
+    ;; Limit of -1 tells not to omit any empty trailing columns.
+    (cons (clojure.string/split header #"\t" -1)
+          (map #(clojure.string/split % #"\t" -1) rows))))
+
+(defn- task1 [db]
+  (let [cols (vector :assembly_accession
+                     :bioproject :biosample
+                     :wgs_master :refseq_category
+                     :taxid :species_taxid :organism_name :infraspecific_name :isolate
+                     :version_status :assembly_level :release_type :genome_rep :seq_rel_date
+                     :asm_name :submitter :gbrs_paired_asm :paired_asm_comp :ftp_path
+                     :excluded_from_refseq :relation_to_type_material)]
+    (let [ddl (jdbc/create-table-ddl :assembly_summary
+                                     (for [c cols]
+                                       [c "varchar"]))]
+      (println ddl)
+      (jdbc/db-do-commands db ddl)
+      (let [rows (rest (get-assembly-summary))]
+        (jdbc/insert-multi! db
+                            :assembly_summary
+                            cols
+                            rows))
+      (println (jdbc/query db ["select count(*) from assembly_summary"]))
+      (let [ddl (jdbc/drop-table-ddl :assembly_summary)]
+        (jdbc/db-do-commands db ddl)))))
+
+(defn -main []
+  (jdbc/with-db-connection [db db]
+    (task1 db)))
