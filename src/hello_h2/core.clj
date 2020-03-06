@@ -59,3 +59,13 @@
 (defn -main []
   (jdbc/with-db-connection [db db]
     (println (task db))))
+
+(defn get-assembly-summary []
+  ;; curl ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/viral/assembly_summary.txt > viral-assembly-summary.txt
+  (let [url "/home/downloads/covid-19/viral-assembly-summary.txt"
+        lines (line-seq (clojure.java.io/reader url))
+        tsv (rest lines)
+        header (subs (first tsv) 2)
+        rows (rest tsv)]
+    (take 2 (cons (clojure.string/split header #"\t")
+                  (map #(clojure.string/split % #"\t") rows)))))
