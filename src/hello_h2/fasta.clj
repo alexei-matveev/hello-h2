@@ -76,7 +76,7 @@
 ;;  "Base3  = TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG"
 ;;  ...
 ;;
-;; Transposed to:
+;; Transposed as columns:
 ;;
 ;; ([\F \- \T \T \T]
 ;;  [\F \- \T \T \C]
@@ -87,6 +87,9 @@
 ;;  [\S \- \T \C \A]
 ;;  ...
 ;;
+;; Returns codon  translation table as  a map  and starter codos  as a
+;; set.
+;;
 (defn- get-iupac-tables []
   (let [iupac_txt "https://raw.githubusercontent.com/biojava/biojava/master/biojava-core/src/main/resources/org/biojava/nbio/core/sequence/iupac.txt"
         text (slurp iupac_txt)
@@ -95,5 +98,11 @@
         ;; Start with Universal:
         universal (rest (take 6 lines))
         ;; Strip the prefixes  like "Base1 = ":
-        table (map #(subs % 9) universal)]
-    (apply map vector table)))
+        table (map #(subs % 9) universal)
+        ;; Transpose the table:
+        columns (apply map vector table)]
+    {:codons (into {} (for [[aa starts base1 base2 base3] columns]
+                        [[base1 base2 base3] aa]))
+     :starts (into #{} (for [[aa starts base1 base2 base3] columns
+                             :when (not= starts \-)]
+                         [base1 base2 base3]))}))
