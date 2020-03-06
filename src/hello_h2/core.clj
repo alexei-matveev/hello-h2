@@ -89,7 +89,7 @@
                             :assembly_summary
                             cols
                             rows))
-      (println (jdbc/query db ["select count(*) from assembly_summary"]))
+      (println (jdbc/query db ["select assembly_accession from assembly_summary where organism_name = 'Severe acute respiratory syndrome coronavirus 2'"]))
       (let [ddl (jdbc/drop-table-ddl :assembly_summary)]
         (jdbc/db-do-commands db ddl)))))
 
