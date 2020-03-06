@@ -58,3 +58,42 @@
 (defn- main []
   (let [fasta (slurp-gz url)]
     (parse-fasta fasta)))
+
+;;
+;; Translation table to  aminoacids see e.g. BioJava  resource [4] and
+;; code [5] with attribution to NCBI [6].
+;;
+;; [4] https://raw.githubusercontent.com/biojava/biojava/master/biojava-core/src/main/resources/org/biojava/nbio/core/sequence/iupac.txt
+;; [5] https://github.com/biojava/biojava/blob/master/biojava-core/src/main/java/org/biojava/nbio/core/sequence/io/IUPACParser.java
+;; [6] https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi?mode=c
+;;
+;;
+;; ("UNIVERSAL=1"
+;;  "AAs    = FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"
+;;  "Starts = ---M---------------M---------------M----------------------------"
+;;  "Base1  = TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG"
+;;  "Base2  = TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG"
+;;  "Base3  = TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG"
+;;  ...
+;;
+;; Transposed to:
+;;
+;; ([\F \- \T \T \T]
+;;  [\F \- \T \T \C]
+;;  [\L \- \T \T \A]
+;;  [\L \M \T \T \G]
+;;  [\S \- \T \C \T]
+;;  [\S \- \T \C \C]
+;;  [\S \- \T \C \A]
+;;  ...
+;;
+(defn- get-iupac-tables []
+  (let [iupac_txt "https://raw.githubusercontent.com/biojava/biojava/master/biojava-core/src/main/resources/org/biojava/nbio/core/sequence/iupac.txt"
+        text (slurp iupac_txt)
+        ;; 6 lines then "\\" then repeat ...
+        lines (clojure.string/split-lines text)
+        ;; Start with Universal:
+        universal (rest (take 6 lines))
+        ;; Strip the prefixes  like "Base1 = ":
+        table (map #(subs % 9) universal)]
+    (apply map vector table)))
