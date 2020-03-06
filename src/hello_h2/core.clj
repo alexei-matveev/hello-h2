@@ -82,16 +82,22 @@
     (let [ddl (jdbc/create-table-ddl :assembly_summary
                                      (for [c cols]
                                        [c "varchar"]))]
-      (println ddl)
+      #_(println ddl)
       (jdbc/db-do-commands db ddl)
-      (let [rows (rest (get-assembly-summary))]
-        (jdbc/insert-multi! db
-                            :assembly_summary
-                            cols
-                            rows))
-      (println (jdbc/query db ["select assembly_accession from assembly_summary where organism_name = 'Severe acute respiratory syndrome coronavirus 2'"]))
-      (let [ddl (jdbc/drop-table-ddl :assembly_summary)]
-        (jdbc/db-do-commands db ddl)))))
+      (try
+        (do
+          (let [rows (rest (get-assembly-summary))]
+            (jdbc/insert-multi! db
+                                :assembly_summary
+                                cols
+                                rows))
+          ;; Return value:
+          (jdbc/query db
+                      ["select assembly_accession from assembly_summary where organism_name = ?"
+                       "Severe acute respiratory syndrome coronavirus 2"]))
+        (finally
+          (let [ddl (jdbc/drop-table-ddl :assembly_summary)]
+            (jdbc/db-do-commands db ddl)))))))
 
 (defn -main []
   (jdbc/with-db-connection [db db]
