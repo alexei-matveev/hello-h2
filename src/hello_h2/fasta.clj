@@ -1,8 +1,11 @@
 ;;
 ;; This is a  hot topic at the beginning of  2020, understandably. See
-;; e.g. Genbank for SARS-CoV-2 [1].
+;; e.g.  Genbank for  the  reference Wuhan-Hu-1  specimen MN908947  of
+;; SARS-CoV-2  [1a, 1b].  The second  link contains  lists also  other
+;; virus speciemen like LC528232.
 ;;
-;; [1] https://www.ncbi.nlm.nih.gov/nuccore/MN908947
+;; [1a] https://www.ncbi.nlm.nih.gov/nuccore/MN908947
+;; [1b] https://www.ncbi.nlm.nih.gov/genbank/sars-cov-2-seqs/
 ;;
 ;; TIL, curl  can list FTP  dirs too, just  add a trailing  slash!
 ;;
