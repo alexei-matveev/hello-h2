@@ -6,7 +6,8 @@
 ;; [2] http://clojure-doc.org/articles/ecosystem/java_jdbc/home.html
 ;;
 (ns hello-h2.core
-  (:require [clojure.java.jdbc :as jdbc]))
+  (:require [clojure.java.jdbc :as jdbc]
+            [clojure.java.io :as io]))
 
 ;; Starting with c.j.jdbc  0.7.6 specs for the in memory  DB can be as
 ;; simple as here  [2]. You need a  named DB if you want  to access it
@@ -14,10 +15,19 @@
 ;; user/password?  FWIW, it is not "sa"/"".
 (def db {:dbtype "h2:mem", :dbname "demo"})
 
+;; Execute bulk SQL from the resource file:
+(defn- exec-sql [db file]
+  (jdbc/db-do-commands db (slurp (io/resource file))))
+
 ;; For a million rows it takes about 10s  + n * 1s to execute. Of that
 ;; 10s is  spent populating  the table  and about 1s  for each  of the
 ;; aggregate funcitons.
 (defn task [db]
+  ;; This schema  is not used so  far. But this would  probably be the
+  ;; proper way for bulk of the schema:
+  (exec-sql db "schema.sql")
+
+  ;; Create, populate, query and delete a table:
   (let [ddl (jdbc/create-table-ddl :kvtable
                                    [[:key "varchar(256)"]
                                     [:value :double]])]
@@ -100,4 +110,5 @@
 
 (defn -main []
   (jdbc/with-db-connection [db db]
+    (task db)
     (genbank db)))
