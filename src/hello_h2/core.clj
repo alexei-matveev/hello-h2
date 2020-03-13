@@ -20,8 +20,8 @@
   (jdbc/db-do-commands db (slurp (io/resource file))))
 
 (defn task-simple [db]
-  ;; This schema  is not used so  far. But this would  probably be the
-  ;; proper way for bulk of the schema:
+  ;; This  is probably  the simplest  way to  create schema,  populate
+  ;; tables and run a query:
   (exec-sql db "schema.sql")
   (jdbc/query db ["select * from report"]))
 
@@ -29,11 +29,6 @@
 ;; 10s is  spent populating  the table  and about 1s  for each  of the
 ;; aggregate funcitons.
 (defn task-longer [db]
-  ;; This schema  is not used so  far. But this would  probably be the
-  ;; proper way for bulk of the schema:
-  (exec-sql db "schema.sql")
-  (jdbc/query db ["select * from meta"])
-
   ;; Create, populate, query and delete a table:
   (let [ddl (jdbc/create-table-ddl :kvtable
                                    [[:key "varchar(256)"]

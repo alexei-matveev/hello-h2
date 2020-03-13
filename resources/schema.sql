@@ -15,4 +15,3 @@ as select m.x, m.y, m.z, d.yt, d.zt
 from meta m
 join data d
 on m.x = d.x;
-
