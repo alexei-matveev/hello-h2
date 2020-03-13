@@ -23,7 +23,7 @@
   ;; This schema  is not used so  far. But this would  probably be the
   ;; proper way for bulk of the schema:
   (exec-sql db "schema.sql")
-  (jdbc/query db ["select * from meta"]))
+  (jdbc/query db ["select * from report"]))
 
 ;; For a million rows it takes about 10s  + n * 1s to execute. Of that
 ;; 10s is  spent populating  the table  and about 1s  for each  of the
