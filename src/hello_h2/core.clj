@@ -19,13 +19,20 @@
 (defn- exec-sql [db file]
   (jdbc/db-do-commands db (slurp (io/resource file))))
 
-;; For a million rows it takes about 10s  + n * 1s to execute. Of that
-;; 10s is  spent populating  the table  and about 1s  for each  of the
-;; aggregate funcitons.
-(defn task [db]
+(defn task-simple [db]
   ;; This schema  is not used so  far. But this would  probably be the
   ;; proper way for bulk of the schema:
   (exec-sql db "schema.sql")
+  (jdbc/query db ["select * from meta"]))
+
+;; For a million rows it takes about 10s  + n * 1s to execute. Of that
+;; 10s is  spent populating  the table  and about 1s  for each  of the
+;; aggregate funcitons.
+(defn task-longer [db]
+  ;; This schema  is not used so  far. But this would  probably be the
+  ;; proper way for bulk of the schema:
+  (exec-sql db "schema.sql")
+  (jdbc/query db ["select * from meta"])
 
   ;; Create, populate, query and delete a table:
   (let [ddl (jdbc/create-table-ddl :kvtable
@@ -110,5 +117,6 @@
 
 (defn -main []
   (jdbc/with-db-connection [db db]
-    (task db)
+    (println (task-simple db))
+    (println (task-longer db))
     (genbank db)))
